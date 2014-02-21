@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load account %}
+{% load url from future %}
+
+{% block body %}
+
+  <h1>Welcome to l8r.io. The simplest way to mark pages to read later.</h1>
+
+    <p>Please sign in below:</p>
+
+    <div class="socialaccount_ballot">
+
+      <ul class="socialaccount_providers">
+      {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+      </ul>
+
+    </div>
+
+{% endblock %}

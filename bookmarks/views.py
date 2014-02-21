@@ -1,21 +1,43 @@
-from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
-from django.utils.cache import add_never_cache_headers, patch_cache_control
+from django.shortcuts import render, redirect
+from django.utils.cache import patch_cache_control
 
 from bookmarks.models import Bookmark
 
+def no_store(view):
+	def inner(*args, **kwargs):
+		response = view(*args, **kwargs)
+		patch_cache_control(response, no_store=True)
+		return response
+	return inner
+
+
+@login_required
+@no_store
 def push_bookmark(request, url):
-	bookmark = Bookmark(url=url)
+	bookmark = Bookmark(user=request.user, url=url)
 	Bookmark.objects.push(bookmark)
-	return HttpResponse("Pushed new bookmark '%s'." % url)
+	context = {
+		'bookmarks': Bookmark.objects.get_stack(request.user),
+		'new_bookmark': bookmark.url,
+	}
+	return render(request, 'bookmarks/list.html', context)
 
-
+@login_required
+@no_store
 def pop_bookmark(request):
-	bookmark = Bookmark.objects.pop()
+	bookmark = Bookmark.objects.pop(request.user)
 	if (bookmark):
-		response = HttpResponse(
-			"<html><script>window.location='%s'</script></html" % bookmark.url)
+		return redirect(bookmark.url)
 	else:
-		response = HttpResponse("No more bookmarks.")
-	patch_cache_control(response, no_store=True)
+		return render(request, 'bookmarks/list.html', {})
+
+@login_required
+@no_store
+def show_bookmarks(request):
+	context = {
+		'bookmarks': Bookmark.objects.get_stack(request.user)
+	}
+	response = render(request, 'bookmarks/list.html', context)
 	return response

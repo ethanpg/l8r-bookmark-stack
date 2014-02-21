@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+  {% if new_bookmark %}
+    <p>Pushed new bookmark <a href="{{ new_bookmark }}">{{ new_bookmark }}</a>.</p>
+  {% endif %}
+
+
+  {% if bookmarks %}
+    <p>Go to <a href="http://l8r.io/pop">l8r.io/pop</a> at any time to go to the first bookmark and mark it as read.</p>
+
+    <p>Current bookmarks:</p>
+    <ul>
+    {% for bookmark in bookmarks %}
+      <li><a href="{{ bookmark.url }}">{{ bookmark.url }}</a>
+    {% endfor %}
+    </ul>
+  {% else %}
+    <p>No bookmarks saved.</p>
+  {% endif %}
+  
+  <p>To save a new bookmark, go to the page you want to bookmark, add <kbd>l8r.io/</kbd> at the beginning of the URL bar and press <kdb>enter</kdb>.</p>
+
+{% endblock %}

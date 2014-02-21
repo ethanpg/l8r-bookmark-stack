@@ -26,17 +26,43 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    # Required by allauth template tags
+    "django.core.context_processors.request",
+    "allauth.account.context_processors.account",
+    "allauth.socialaccount.context_processors.socialaccount",
+    'django.contrib.auth.context_processors.auth',
+)
+
+AUTHENTICATION_BACKENDS = (
+#    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
 
 # Application definition
 
 INSTALLED_APPS = (
+    'bookstack',
+    'bookmarks',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'bookmarks'
+
+    # for django-allauth
+    'django.contrib.sites',
+#    'django.contrib.auth.backends.ModelBackend',
+#    'allauth.account.auth_backends.AuthenticationBackend',
+    'django.contrib.auth.backends',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.facebook',
+    
+    'debug_toolbar',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -82,6 +108,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# required by djang-allauth, which uses django.contrib.sites
+SITE_ID = 1
+
+LOGIN_REDIRECT_URL = '/'
 
 # Parse database configuration from $DATABASE_URL
 import dj_database_url
